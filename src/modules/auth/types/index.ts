@@ -1,0 +1,7 @@
+export { ILogin } from './login'
+export { IRegister } from './register'
+export { IUser } from './user'
+export { ICode } from './code'
+export { IChangeUserPartOne, IChangeUserPartTwo, IChangeUser } from './changeUser'
+export { Profile } from './profile'
+export { Avatar } from './avatar'

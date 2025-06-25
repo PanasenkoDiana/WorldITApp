@@ -1,0 +1,1 @@
+export { FriendsLayout } from "./FriendsLayout"
