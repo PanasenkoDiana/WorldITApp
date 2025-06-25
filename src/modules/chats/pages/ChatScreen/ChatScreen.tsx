@@ -111,12 +111,12 @@ export function ChatScreen() {
 										Math.random().toString()
 									}
 									style={
-										msg.senderId === currentUserId
+										msg.authorId === currentUserId
 											? styles.myMessage
 											: styles.theirMessage
 									}
 								>
-									{msg.senderId !== currentUserId &&
+									{msg.authorId !== currentUserId &&
 									thisRecipient?.Profile?.avatars?.length ? (
 										<Image
 											source={{
@@ -129,7 +129,7 @@ export function ChatScreen() {
 											style={styles.messageAvatar}
 										/>
 									) : (
-										msg.senderId !== currentUserId && (
+										msg.authorId !== currentUserId && (
 											<DefaultAvatar
 												style={styles.messageAvatar}
 											/>
@@ -137,7 +137,7 @@ export function ChatScreen() {
 									)}
 									<View
 										style={
-											msg.senderId === currentUserId
+											msg.authorId === currentUserId
 												? styles.myMessageText
 												: styles.theirMessageText
 										}

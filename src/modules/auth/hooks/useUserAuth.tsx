@@ -39,17 +39,18 @@ export function authUser(setUser: (user: IUser | null) => void) {
 				body: JSON.stringify({ email, password }),
 			});
 
-			const result: Result<string> = await response.json();
+			const json = await response.json();
 
-			if (result.status === "error") {
-				return result;
+			if (!response.ok || !json.token) {
+				return { status: "error", message: "Invalid credentials" };
 			}
 
-			await AsyncStorage.setItem("token", result.data);
+			await AsyncStorage.setItem("token", json.token);
+			await getData(json.token);
 
-			await getData(result.data);
+			console.log(`Token: ${json.token}`);
 
-			return result;
+			return { status: "success", data: json.token };
 		} catch (error) {
 			return { status: "error", message: "An unexpected error occurred" };
 		}
@@ -61,11 +62,14 @@ export function authUser(setUser: (user: IUser | null) => void) {
 		password: string
 	): Promise<Result<string>> {
 		try {
-			const response = await fetch(`${SERVER_HOST}api/user/register`, {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ email, password }),
-			});
+			const response = await fetch(
+				`${SERVER_HOST}api/user/register/start`,
+				{
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ email, password }),
+				}
+			);
 
 			const result: Result<string> = await response.json();
 
@@ -84,11 +88,14 @@ export function authUser(setUser: (user: IUser | null) => void) {
 		code: string
 	): Promise<Result<string>> {
 		try {
-			const response = await fetch(`${SERVER_HOST}api/user/verify`, {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ email, code }),
-			});
+			const response = await fetch(
+				`${SERVER_HOST}api/user/register/confirm`,
+				{
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ email, code }),
+				}
+			);
 
 			const result: Result<string> = await response.json();
 
@@ -98,6 +105,7 @@ export function authUser(setUser: (user: IUser | null) => void) {
 
 			await AsyncStorage.setItem("token", result.data);
 			await getData(result.data);
+			console.log(`Token: ${result.data}`);
 
 			return result;
 		} catch (error) {

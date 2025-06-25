@@ -1,5 +1,4 @@
-import { useEffect } from "react";
-import { ScrollView, View, Image, Text, TouchableOpacity } from "react-native";
+import { View, Image, Text, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { styles } from "./main.styles";
 import { COLORS } from "../../../shared/ui/colors";
@@ -12,19 +11,18 @@ export function Main() {
 
 	if (!user) return null;
 
+	// Берем массив аватаров из user_app_profile
+	const avatars = user.user_app_profile?.user_app_avatar || [];
+
+	// Берем последний аватар, если есть
+	const lastAvatar = avatars.length > 0 ? avatars[avatars.length - 1] : null;
+
 	return (
 		<View style={styles.container}>
 			<View style={styles.profileSection}>
-				{user?.Profile?.avatars?.length > 0 &&
-				user.Profile.avatars[user.Profile.avatars.length - 1]?.image ? (
+				{lastAvatar && lastAvatar.image ? (
 					<Image
-						source={{
-							uri: `${SERVER_HOST}media/${
-								user.Profile.avatars[
-									user.Profile.avatars.length - 1
-								].image.filename
-							}`,
-						}}
+						source={{ uri: `${SERVER_HOST}media/${lastAvatar.image}` }}
 						style={styles.avatar}
 					/>
 				) : (
@@ -32,7 +30,7 @@ export function Main() {
 				)}
 
 				<Text style={styles.fullName}>
-					{user.name} {user.surname}
+					{user.first_name} {user.last_name}
 				</Text>
 				<Text style={styles.username}>@{user.username}</Text>
 
@@ -52,31 +50,19 @@ export function Main() {
 				</View>
 
 				<View style={styles.buttonContainer}>
-					<TouchableOpacity
-						style={[styles.button, styles.confirmButton]}
-					>
+					<TouchableOpacity style={[styles.button, styles.confirmButton]}>
 						<Text style={styles.buttonText}>Підтвердити</Text>
 					</TouchableOpacity>
-					<TouchableOpacity
-						style={[styles.button, styles.deleteButton]}
-					>
-						<Text
-							style={[styles.buttonText, styles.deleteButtonText]}
-						>
+					<TouchableOpacity style={[styles.button, styles.deleteButton]}>
+						<Text style={[styles.buttonText, styles.deleteButtonText]}>
 							Видалити
 						</Text>
 					</TouchableOpacity>
 				</View>
 
 				<TouchableOpacity style={styles.albumButton}>
-					<Ionicons
-						name="images-outline"
-						size={24}
-						color={COLORS.black}
-					/>
-					<Text style={styles.albumButtonText}>
-						Переглянути альбом
-					</Text>
+					<Ionicons name="images-outline" size={24} color={COLORS.black} />
+					<Text style={styles.albumButtonText}>Переглянути альбом</Text>
 				</TouchableOpacity>
 			</View>
 		</View>

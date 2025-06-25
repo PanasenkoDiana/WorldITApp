@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { IUser } from "../../../auth/types";
 import { useFriends } from "../../../friends/hooks/useFriends";
+import { IGroupChat } from "../../entities/create-group-chat-modal/modal.types";
 
 interface INotificationsPage {
 	notifications: ChatMessage[];
@@ -56,8 +57,8 @@ export function NotificationsPage(props: INotificationsPage) {
 		loadUserId();
 		getAllFriends();
 	}, []);
-	const safeChats: IChat[] = chats ?? [];
-	const filteredChats = safeChats.filter((chat: IChat) => {
+	const safeChats: IGroupChat[] = chats ?? [];
+	const filteredChats = safeChats.filter((chat: IGroupChat) => {
 		if (!currentUserId) return false;
 		const member = chat.members?.find((m: IUser) => m.id !== currentUserId);
 		if (!member) return false;
@@ -67,7 +68,7 @@ export function NotificationsPage(props: INotificationsPage) {
 	const sortedChats = [...filteredChats].sort((a, b) => {
 		const lastAMsg = a.messages[a.messages.length - 1];
 		const lastBMsg = b.messages[b.messages.length - 1];
-		return new Date(lastBMsg.sent_at).getTime() - new Date(lastAMsg.sent_at).getTime();
+		return new Date(lastBMsg.sentAt as string).getTime() - new Date(lastBMsg.sentAt as string).getTime();
 	});
 
 	return (
@@ -125,10 +126,10 @@ export function NotificationsPage(props: INotificationsPage) {
 										</View>
 
 										<Text style={styles.time}>
-											{lastMessage ? formatMessageTime(lastMessage.sent_at) : ""}
+											{lastMessage ? formatMessageTime(lastMessage.sentAt as string) : ""}
 										</Text>
 									</View>
-									<Text style={styles.notificationContent}>{item.content}</Text>
+									<Text style={styles.notificationContent}>{lastMessage.content}</Text>
 								</View>
 							</View>
 						</TouchableOpacity>
