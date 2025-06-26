@@ -45,10 +45,10 @@ export function SettingsPagePartTwo() {
 	return (
 		<View style={[styles.changeSettingsBlock]}>
 			<SettingsChangeHeader title={"Особиста інформація"} onRedact={()=>setIsRedact(!isRedact)} />
-			<View pointerEvents={isRedact ? 'auto' : 'none'} >
+			<View pointerEvents={isRedact ? 'auto' : 'none'} style={{gap: 10}} >
 				<Controller
 					control={control}
-					name="name"
+					name="first_name"
 					render={({
 						field: { value, onChange, onBlur },
 						fieldState: { error },
@@ -59,7 +59,7 @@ export function SettingsPagePartTwo() {
 							onChangeText={onChange}
 							disabled={isRedact ? false : true}
 							placeholder="Ім'я"
-							defaultValue={user?.name}
+							defaultValue={user?.first_name}
 							onBlur={onBlur}
 							error={error?.message}
 						/>
@@ -67,7 +67,7 @@ export function SettingsPagePartTwo() {
 				/>
 				<Controller
 					control={control}
-					name="surname"
+					name="last_name"
 					render={({
 						field: { value, onChange, onBlur },
 						fieldState: { error },
@@ -78,7 +78,7 @@ export function SettingsPagePartTwo() {
 							onChangeText={onChange}
 							disabled={isRedact ? false : true}
 							placeholder="Прізвище"
-							defaultValue={user?.surname}
+							defaultValue={user?.last_name}
 							onBlur={onBlur}
 							error={error?.message}
 						/>

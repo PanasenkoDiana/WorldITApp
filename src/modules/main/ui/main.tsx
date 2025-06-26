@@ -59,11 +59,6 @@ export function Main() {
 						</Text>
 					</TouchableOpacity>
 				</View>
-
-				<TouchableOpacity style={styles.albumButton}>
-					<Ionicons name="images-outline" size={24} color={COLORS.black} />
-					<Text style={styles.albumButtonText}>Переглянути альбом</Text>
-				</TouchableOpacity>
 			</View>
 		</View>
 	);

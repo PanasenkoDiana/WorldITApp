@@ -51,6 +51,7 @@ export function SettingsPagePartOne() {
     }
 
     async function onSubmit(data: IChangeUserPartOne) {
+        console.log('data:' + data, 'user:'+ user)
         if (!user) return;
 
         try {
@@ -97,15 +98,15 @@ export function SettingsPagePartOne() {
                         source={
                             image
                                 ? { uri: `data:image/png;base64,${image}` }
-                                : user?.Profile.avatars?.[user.Profile.avatars.length - 1]
-                                ? { uri: `${SERVER_HOST}media/${user.Profile.avatars[user.Profile.avatars.length - 1].image.filename}` }
+                                : user?.user_app_profile.user_app_avatar?.[user.user_app_profile.user_app_avatar.length - 1]
+                                ? { uri: `${SERVER_HOST}media/${user.user_app_profile.user_app_avatar[user.user_app_profile.user_app_avatar.length - 1].image}` }
                                 : defaultAvatar
                         }
                     />
                 </TouchableOpacity>
 
                 <Text style={styles.profileAvatarName}>
-                    {user?.name} {user?.surname}
+                    {user?.first_name} {user?.last_name}
                 </Text>
                 
                 <Controller

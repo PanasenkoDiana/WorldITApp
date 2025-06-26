@@ -1,13 +1,13 @@
-import { IAlbum } from "../../albums/types"
-import { Profile } from "../../auth/types"
-import { IImage } from "../../userpost/types"
-import { IProfile } from "../../userpost/types/post"
+import { IAlbum } from "../../albums/types";
+import { Profile } from "../../auth/types";
+import { IImage } from "../../userpost/types";
+import { IProfile } from "../../userpost/types/post";
 
-export interface IUser{
-    username: string
-    name: string
-    surname: string
-    Profile: Profile
+export interface IUser {
+	username: string;
+	name: string;
+	surname: string;
+	Profile: Profile;
 }
 
 export interface IFriendRequest {

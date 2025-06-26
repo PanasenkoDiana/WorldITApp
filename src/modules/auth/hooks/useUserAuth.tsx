@@ -4,7 +4,7 @@ import { ISecondRegisterForm } from "../ui/second-register-modal/modal.types";
 import { SERVER_HOST } from "../../../shared/constants";
 import { Result } from "../../../shared/types/result";
 
-export function authUser(setUser: (user: IUser | null) => void) {
+export function authUser(setUser: (user: IUser | null) => void, setToken: (token: string | null) => void) {
 	async function getData(token: string): Promise<Result<IUser>> {
 		try {
 			const response = await fetch(`${SERVER_HOST}api/user/me`, {
@@ -17,6 +17,7 @@ export function authUser(setUser: (user: IUser | null) => void) {
 				return result;
 			}
 
+			// alert(JSON.stringify(result))
 			setUser(result.data);
 			console.log(5);
 			console.log(result.data);
@@ -40,23 +41,26 @@ export function authUser(setUser: (user: IUser | null) => void) {
 			});
 
 			const json = await response.json();
+			// console.log(JSON.stringify(json))
 
-			if (!response.ok || !json.token) {
-				return { status: "error", message: "Invalid credentials" };
-			}
+			// if (!response.ok || !json.token) {
+			// 	return { status: "error", message: "Invalid credentials" };
+			// }
 
-			await AsyncStorage.setItem("token", json.token);
-			await getData(json.token);
 
-			console.log(`Token: ${json.token}`);
+			await AsyncStorage.setItem("token", json.data);
+			await getData(json.data);
 
-			return { status: "success", data: json.token };
+			console.log(`Token: ${json.data}`);
+
+			setToken(json.data)
+
+			return { status: "success", data: json.data };
 		} catch (error) {
 			return { status: "error", message: "An unexpected error occurred" };
 		}
 	}
 
-	// В register backend не принимает username? Тогда удалим из параметров
 	async function register(
 		email: string,
 		password: string
@@ -106,6 +110,7 @@ export function authUser(setUser: (user: IUser | null) => void) {
 			await AsyncStorage.setItem("token", result.data);
 			await getData(result.data);
 			console.log(`Token: ${result.data}`);
+			setToken(result.data)
 
 			return result;
 		} catch (error) {
@@ -144,6 +149,7 @@ export function authUser(setUser: (user: IUser | null) => void) {
 		data: IChangeUserPartOne
 	): Promise<Result<IUser>> {
 		try {
+			console.log("Changing user part one with data:", data);
 			const token = await AsyncStorage.getItem("token");
 			const response = await fetch(
 				`${SERVER_HOST}api/user/change/part-one`,

@@ -4,9 +4,9 @@ export interface IChangeUserPartOne {
 }
 
 export interface IChangeUserPartTwo {
-    name: string
-    surname: string
-    dateOfBirth: DataView
+    first_name: string
+    last_name: string
+    date_of_birth: DataView
     email: string
     password: string
     repeatPassword: string

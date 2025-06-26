@@ -13,10 +13,12 @@ import { Result } from "../../../shared/types/result";
 
 interface IUserContext {
 	user: IUser | null;
+	token: string | null
 	login: (email: string, password: string) => Promise<Result<string>>;
 	register: (email: string, password: string) => Promise<Result<string>>;
 	isAuthenticated: () => boolean;
 	setUser: (user: IUser | null) => void;
+	setToken: (token: string | null) => void
 	getToken: () => Promise<string | null>;
 	verify: (email: string, code: string) => Promise<Result<string>>;
 	fetchUser: () => Promise<void>;
@@ -28,14 +30,14 @@ interface IUserContext {
 	) => Promise<Result<IUser>>;
 }
 
-// ⛔ Удаляем старый импорт User и используем только IUser
-
 const initialValue: IUserContext = {
 	user: null,
+	token: null,
 	login: async () => ({ status: "error", message: "Not implemented" }),
 	register: async () => ({ status: "error", message: "Not implemented" }),
 	isAuthenticated: () => false,
 	setUser: () => {},
+	setToken: () => {},
 	getToken: async () => null,
 	verify: async () => ({ status: "error", message: "Not implemented" }),
 	fetchUser: async () => {},
@@ -65,6 +67,7 @@ interface IUserContextProviderProps {
 
 export function UserContextProvider({ children }: IUserContextProviderProps) {
 	const [user, setUser] = useState<IUser | null>(null);
+	const [token, setToken] = useState<string | null>(null)
 
 	const {
 		getData,
@@ -74,11 +77,18 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
 		changeUserPartOne,
 		changeUserPartTwo,
 		addSecondUserInfo,
-	} = authUser(setUser);
+	} = authUser(setUser, setToken);
 
 	useEffect(() => {
 		fetchUser();
 	}, []);
+
+	useEffect(() => {
+		AsyncStorage.setItem('token', `${token}`)
+	}, [token])
+	useEffect(() => {
+		console.log("user:",user)
+	}, [user])
 
 	async function fetchUser() {
 		const token = await AsyncStorage.getItem("token");
@@ -106,6 +116,8 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
 		<userContext.Provider
 			value={{
 				user,
+				token,
+				setToken,
 				login,
 				register,
 				isAuthenticated,
