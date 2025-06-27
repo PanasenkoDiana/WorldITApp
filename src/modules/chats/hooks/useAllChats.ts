@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { SERVER_HOST } from "../../../shared/constants";
 import { useUserContext } from "../../auth/context/userContext";
-import { IGroupChat, IGroupForm } from "../entities/create-group-chat-modal/modal.types";
+import { IGroupForm } from "../entities/create-group-chat-modal/modal.types";
+import { ChatGroup } from "../../../shared/types";
 
 export function useAllChats() {
-	const [chats, setChats] = useState<IGroupChat[] | null>(null);
+	const [chats, setChats] = useState<ChatGroup[] | null>(null);
 	const { getToken } = useUserContext();
 
 	async function getAllChats() {
@@ -23,10 +24,6 @@ export function useAllChats() {
 			console.log(err);
 		}
 	}
-
-	useEffect(() => {
-		getAllChats();
-	}, []);
 
 	// const chats
 

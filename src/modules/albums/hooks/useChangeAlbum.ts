@@ -4,10 +4,6 @@ import { SERVER_HOST } from "../../../shared/constants"
 import { Result } from "../../../shared/types/result"
 import { IUpdateAlbumModalForm } from "../entities/ui/create-album-modal/modal.types"
 
-
-
-
-
 export function useChangeAlbum(){
     const [ myPhotos, setMyPhotos ] = useState<IMyPhotosList | null>(null)
     const [ isLoading, setIsLoading ] = useState<boolean>(false)

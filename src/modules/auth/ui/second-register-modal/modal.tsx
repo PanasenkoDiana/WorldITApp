@@ -40,7 +40,7 @@ export function SecondRegisterModal(props: ISecondRegisterModalProps) {
 				>
 					<Controller
 						control={control}
-						name="name"
+						name="first_name"
 						rules={{ required: "Напишіть своє ім'я" }}
 						render={({
 							field: { value, onChange, onBlur },
@@ -58,7 +58,7 @@ export function SecondRegisterModal(props: ISecondRegisterModalProps) {
 					/>
 					<Controller
 						control={control}
-						name="surname"
+						name="last_name"
 						rules={{ required: "Напишіть своє прізвище" }}
 						render={({
 							field: { value, onChange, onBlur },

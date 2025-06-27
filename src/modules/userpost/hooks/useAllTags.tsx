@@ -28,9 +28,9 @@ export function useAllTags(){
 		}
     }
 
-	useEffect(()=>{
-		allTags()
-	}, [])
+	// useEffect(()=>{
+	// 	allTags()
+	// }, [])
 
 	return {tags, isLoading, error, allTags}
 }

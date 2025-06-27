@@ -9,7 +9,6 @@ import {
 } from "react-native"
 import { Controller, useForm } from "react-hook-form"
 import * as ImagePicker from "expo-image-picker"
-
 import { COLORS } from "../../../../shared/ui/colors"
 import { GalleryIcon, PlusIcon, TrashIcon } from "../../../../shared/ui/icons"
 import { DefaultAvatar } from "../../../../shared/ui/images"
@@ -137,8 +136,8 @@ export function CreateGroupChatModal(props: ICreateGroupChatModalProps) {
 						scrollEnabled
 						renderItem={({ item }) => {
 							const avatar =
-								item.Profile.avatars?.[item.Profile.avatars.length - 1]
-									?.image?.filename
+								item.user_app_profile.user_app_avatar[item.user_app_profile.user_app_avatar.length - 1]
+									?.image
 
 							const handleRemove = () => {
 								setSelectedContacts((prev) =>
@@ -168,7 +167,7 @@ export function CreateGroupChatModal(props: ICreateGroupChatModalProps) {
 									)}
 
 									<Text style={styles.contactName}>
-										{item.name} {item.surname}
+										{item.first_name} {item.last_name}
 									</Text>
 
 									<TouchableOpacity

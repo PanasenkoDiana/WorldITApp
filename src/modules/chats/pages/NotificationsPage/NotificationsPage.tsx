@@ -1,14 +1,14 @@
 import { View, Text, FlatList, Image, TouchableOpacity } from "react-native";
 import { styles } from "./NotificationsPage.styles";
-import { ChatMessage } from "../../types/types";
+// import { ChatMessage } from "../../types/types";
 import { useRouter } from "expo-router";
 import { useAllChats } from "../../hooks/useAllChats";
 import { SERVER_HOST } from "../../../../shared/constants";
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { IUser } from "../../../auth/types";
 import { useFriends } from "../../../friends/hooks/useFriends";
-import { IGroupChat } from "../../entities/create-group-chat-modal/modal.types";
+import { ChatGroup, ChatMessage, User } from "../../../../shared/types";
+// import { IGroupChat } from "../../entities/create-group-chat-modal/modal.types";
 
 interface INotificationsPage {
 	notifications: ChatMessage[];
@@ -16,7 +16,7 @@ interface INotificationsPage {
 
 interface IChat {
 	id: number;
-	members?: IUser[];
+	members?: User[];
 	messages: { sent_at: string; content: string }[];
 	content?: string;
 }
@@ -31,7 +31,10 @@ function formatMessageTime(isoString: string): string {
 		messageDate.getFullYear() === now.getFullYear();
 
 	return isToday
-		? messageDate.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+		? messageDate.toLocaleTimeString([], {
+				hour: "2-digit",
+				minute: "2-digit",
+		  })
 		: messageDate.toLocaleDateString("ru-RU");
 }
 
@@ -41,7 +44,7 @@ export function NotificationsPage(props: INotificationsPage) {
 
 	const { friends, getAllFriends } = useFriends();
 
-	const [currentUserId, setCurrentUserId] = useState<number | null>(null);
+	const [currentUserId, setCurrentUserId] = useState<number>(-1);
 
 	useEffect(() => {
 		const loadUserId = async () => {
@@ -55,20 +58,29 @@ export function NotificationsPage(props: INotificationsPage) {
 			}
 		};
 		loadUserId();
-		getAllFriends();
 	}, []);
-	const safeChats: IGroupChat[] = chats ?? [];
-	const filteredChats = safeChats.filter((chat: IGroupChat) => {
+	const safeChats: ChatGroup[] = chats ?? [];
+	const filteredChats = safeChats.filter((chat: ChatGroup) => {
 		if (!currentUserId) return false;
-		const member = chat.members?.find((m: IUser) => m.id !== currentUserId);
+
+		const member = chat.chat_app_chatgroup_members?.find(
+			(m) => Number(m.id) !== currentUserId
+		);
+
 		if (!member) return false;
-		return friends.some((friend) => friend.id === member.id);
+
+		return friends.some((friend) => friend.id === Number(member.id));
 	});
 
 	const sortedChats = [...filteredChats].sort((a, b) => {
-		const lastAMsg = a.messages[a.messages.length - 1];
-		const lastBMsg = b.messages[b.messages.length - 1];
-		return new Date(lastBMsg.sentAt as string).getTime() - new Date(lastBMsg.sentAt as string).getTime();
+		const lastAMsg =
+			a.chat_app_chatmessage[a.chat_app_chatmessage.length - 1];
+		const lastBMsg =
+			b.chat_app_chatmessage[b.chat_app_chatmessage.length - 1];
+		return (
+			new Date(`${lastBMsg.sent_at}` as string).getTime() -
+			new Date(`${lastBMsg.sent_at}`).getTime()
+		);
 	});
 
 	return (
@@ -78,11 +90,18 @@ export function NotificationsPage(props: INotificationsPage) {
 				contentContainerStyle={styles.list}
 				keyExtractor={(item) => item.id.toString()}
 				renderItem={({ item }) => {
-					const lastMessage = item.messages[item.messages.length - 1];
-					const member = item.members?.find((m: IUser) => m.id !== currentUserId);
+					const lastMessage =
+						item.chat_app_chatmessage[
+							item.chat_app_chatmessage.length - 1
+						];
+
+					const member = item.chat_app_chatgroup_members?.find(
+						m => Number(m.id) !== currentUserId
+					);
 					if (!member) return null;
 
-					const profileImage = member.Profile?.avatars?.at(-1)?.image?.filename;
+					const profileImage =
+						member.user_app_profile?.user_app_avatar?.at(-1)?.image;
 
 					return (
 						<TouchableOpacity
@@ -90,11 +109,21 @@ export function NotificationsPage(props: INotificationsPage) {
 								router.push({
 									pathname: "/chat",
 									params: {
-										recipientId: member.id,
-										recipientUsername: member.username,
+										recipientId:
+											member.user_app_profile.auth_user
+												.id,
+										recipientUsername:
+											member.user_app_profile.auth_user
+												.username,
 										recipientName:
-											`${member.name || ""} ${member.surname || ""}`.trim() ||
-											`@${member.username}`,
+											`${
+												member.user_app_profile
+													.auth_user.first_name || ""
+											} ${
+												member.user_app_profile
+													.auth_user.last_name || ""
+											}`.trim() ||
+											`@${member.user_app_profile.auth_user.username}`,
 									},
 								})
 							}
@@ -103,33 +132,51 @@ export function NotificationsPage(props: INotificationsPage) {
 								<View>
 									{profileImage ? (
 										<Image
-											source={{ uri: `${SERVER_HOST}media/${profileImage}` }}
+											source={{
+												uri: `${SERVER_HOST}media/${profileImage}`,
+											}}
 											style={styles.contactImage}
 										/>
 									) : (
-										<View style={styles.contactImagePlaceholder} />
+										<View
+											style={
+												styles.contactImagePlaceholder
+											}
+										/>
 									)}
 								</View>
 								<View style={styles.infoContainer}>
 									<View style={styles.nameContainer}>
 										<View>
 											<Text style={styles.contactName}>
-												{member.name && member.surname
-													? `${member.name} ${member.surname}`
-													: member.surname
-													? member.surname
-													: member.username
-													? `@${member.username}`
+												{member.user_app_profile
+													.auth_user.first_name &&
+												member.user_app_profile
+													.auth_user.last_name
+													? `${member.user_app_profile.auth_user.first_name} ${member.user_app_profile.auth_user.last_name}`
+													: member.user_app_profile
+															.auth_user.last_name
+													? member.user_app_profile
+															.auth_user.last_name
+													: member.user_app_profile
+															.auth_user.username
+													? `@${member.user_app_profile.auth_user.username}`
 													: ""}
 											</Text>
 											<Text>{lastMessage?.content}</Text>
 										</View>
 
 										<Text style={styles.time}>
-											{lastMessage ? formatMessageTime(lastMessage.sentAt as string) : ""}
+											{lastMessage
+												? formatMessageTime(
+														`${lastMessage.sent_at}`
+												  )
+												: ""}
 										</Text>
 									</View>
-									<Text style={styles.notificationContent}>{lastMessage.content}</Text>
+									<Text style={styles.notificationContent}>
+										{lastMessage.content}
+									</Text>
 								</View>
 							</View>
 						</TouchableOpacity>

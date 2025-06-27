@@ -3,7 +3,7 @@ import { styles } from "./AllChatsPage.styles";
 import { useRouter } from "expo-router";
 import { useAllChats } from "../../hooks/useAllChats";
 import { useEffect } from "react";
-import { IGroupChat } from "../../entities/create-group-chat-modal/modal.types";
+// import { IGroupChat } from "../../entities/create-group-chat-modal/modal.types";
 import { DefaultAvatar } from "../../../../shared/ui/images";
 import { SERVER_HOST } from "../../../../shared/constants";
 
@@ -40,9 +40,9 @@ export function AllChatsPage() {
 				data={chats}
 				keyExtractor={(item) => item.id.toString()}
 				renderItem={({ item }) => {
-					const lastMessage = item.messages[item.messages.length - 1];
-					const sender = item.members.find(
-						(m) => m.id === lastMessage?.authorId
+					const lastMessage = item.chat_app_chatmessage[item.chat_app_chatmessage.length - 1];
+					const sender = item.chat_app_chatgroup_members.find(
+						(m) => m.id === lastMessage?.author_id
 					);
 					// alert(JSON.stringify(item.members))
 					// alert(JSON.stringify(item))
@@ -71,22 +71,22 @@ export function AllChatsPage() {
 												justifyContent: "space-between",
 											}}
 										>
-											{sender?.name ? (
+											{sender?.user_app_profile.auth_user.first_name ? (
 												<Text
 													style={
 														styles.lastMessageName
 													}
 												>
-													{sender.name}{" "}
-													{sender.surname}
+													{sender.user_app_profile.auth_user.first_name}{" "}
+													{sender.user_app_profile.auth_user.last_name}
 												</Text>
-											) : sender?.surname ? (
+											) : sender?.user_app_profile.auth_user.last_name ? (
 												<Text
 													style={
 														styles.lastMessageName
 													}
 												>
-													{sender.surname}
+													{sender.user_app_profile.auth_user.last_name}
 												</Text>
 											) : (
 												<Text
@@ -94,13 +94,13 @@ export function AllChatsPage() {
 														styles.lastMessageName
 													}
 												>
-													{sender?.username}
+													{sender?.user_app_profile.auth_user.username}
 												</Text>
 											)}
 											<Text style={styles.time}>
 												{lastMessage
 													? formatMessageTime(
-															lastMessage.sentAt ||
+															`${lastMessage.sent_at}` ||
 																""
 													  )
 													: ""}

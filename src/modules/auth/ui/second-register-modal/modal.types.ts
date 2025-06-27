@@ -1,5 +1,5 @@
 export interface ISecondRegisterForm{
-    name: string,
-    surname: string,
+    first_name: string,
+    last_name: string,
     username: string,
 }

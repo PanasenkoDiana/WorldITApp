@@ -2,14 +2,14 @@ import { useState, useEffect, useRef } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { io, Socket } from "socket.io-client";
 import { SERVER_HOST } from "../../../../shared/constants";
-import { IUser } from "../../../auth/types";
+import { ChatMessage as Message, User } from "../../../../shared/types";
 
 const SOCKET_URL = SERVER_HOST;
 
-export type Message = {
+export type MessageLocal = {
 	id?: number;
 	content: string;
-	authorId: number;
+	senderId: number;
 	chatGroupId?: number;
 	sentAt?: string;
 };
@@ -22,22 +22,26 @@ export type GroupedMessage = {
 export function useChat(
 	recipientId?: string,
 	recipientUsername?: string,
-	getRecipient?: (id: number) => Promise<{ data?: IUser | null }>
+	getRecipient?: (id: number) => Promise<{ data?: User | null }>
 ) {
 	const [messages, setMessages] = useState<Message[]>([]);
 	const [newMessage, setNewMessage] = useState("");
 	const [chatGroupId, setChatGroupId] = useState<number | null>(null);
 	const [currentUserId, setCurrentUserId] = useState<number | null>(null);
-	const [thisRecipient, setThisRecipient] = useState<IUser | null>(null);
+	const [thisRecipient, setThisRecipient] = useState<User | null>(null);
 	const socketRef = useRef<Socket | null>(null);
 
-	// Чтобы не отправлять одни и те же запросы повторно
 	const savedRecipientUsername = useRef<string | undefined>(undefined);
 	const savedRecipientId = useRef<string | undefined>(undefined);
 
 	useEffect(() => {
 		async function fetchRecipient() {
-			if (!recipientId || savedRecipientId.current === recipientId || !getRecipient) return;
+			if (
+				!recipientId ||
+				savedRecipientId.current === recipientId ||
+				!getRecipient
+			)
+				return;
 
 			savedRecipientId.current = recipientId;
 
@@ -62,7 +66,11 @@ export function useChat(
 	}, []);
 
 	useEffect(() => {
-		if (!recipientUsername || savedRecipientUsername.current === recipientUsername) return;
+		if (
+			!recipientUsername ||
+			savedRecipientUsername.current === recipientUsername
+		)
+			return;
 
 		savedRecipientUsername.current = recipientUsername;
 
@@ -77,7 +85,7 @@ export function useChat(
 							"Content-Type": "application/json",
 							...(token ? { Authorization: `Bearer ${token}` } : {}),
 						},
-						body: JSON.stringify({ recipientUsername }),
+						body: JSON.stringify({ recipientId }),
 					}
 				);
 
@@ -112,17 +120,21 @@ export function useChat(
 
 				if (response.ok) {
 					const data = await response.json();
+
+					// Маппим сообщения в ожидаемый формат
 					const sorted = data
 						.map((msg: any) => ({
 							id: msg.id,
 							content: msg.content,
-							senderId: msg.authorId,
-							chatGroupId: msg.chatGroupId,
-							sentAt: msg.sent_at,
+							author_id: Number(msg.author_id), // здесь auth_user может отсутствовать, берём напрямую author_id
+							chat_group_id: Number(msg.chat_group_id),
+							sent_at: msg.sent_at,
+							user_app_profile: msg.user_app_profile,
 						}))
 						.sort(
 							(a: Message, b: Message) =>
-								new Date(a.sentAt!).getTime() - new Date(b.sentAt!).getTime()
+								new Date(a.sent_at).getTime() -
+								new Date(b.sent_at).getTime()
 						);
 
 					setMessages(sorted);
@@ -141,9 +153,14 @@ export function useChat(
 		socketRef.current = io(SOCKET_URL, { transports: ["websocket"] });
 		socketRef.current.emit("join_group", chatGroupId);
 
-		socketRef.current.on("group_message", (msg: Message) => {
-			if (msg.chatGroupId === chatGroupId) {
-				setMessages((prev) => [...prev, msg]);
+		socketRef.current.on("group_message", (msg: any) => {
+			// Приводим к числу для сравнения
+			if (Number(msg.chat_group_id) === chatGroupId) {
+				setMessages((prev) => [...prev, {
+					...msg,
+					author_id: Number(msg.author_id),
+					chat_group_id: Number(msg.chat_group_id),
+				}]);
 			}
 		});
 
@@ -153,7 +170,8 @@ export function useChat(
 	}, [chatGroupId]);
 
 	const sendMessage = async () => {
-		if (!newMessage.trim() || !chatGroupId || currentUserId === null) return;
+		if (!newMessage.trim() || !chatGroupId || currentUserId === null)
+			return;
 
 		const token = await AsyncStorage.getItem("token");
 
@@ -176,21 +194,19 @@ export function useChat(
 		}
 
 		const msgObj = await response.json();
-		const formattedMessage: Message = {
+
+		const formattedMessage = {
 			id: msgObj.id,
 			content: msgObj.content,
-			authorId: currentUserId,
-			chatGroupId,
-			sentAt: msgObj.sent_at,
+			author_id: Number(msgObj.author_id), // исправлено на author_id
+			chat_group_id: Number(msgObj.chat_group_id),
+			sent_at: msgObj.sent_at,
+			user_app_profile: msgObj.user_app_profile,
 		};
 
 		setNewMessage("");
 
-		socketRef.current?.emit("group_message", {
-			groupId: chatGroupId,
-			content: formattedMessage.content,
-			senderId: formattedMessage.authorId,
-		});
+		socketRef.current?.emit("group_message", formattedMessage);
 	};
 
 	function formatTime(isoString?: string): string {
@@ -215,7 +231,7 @@ export function useChat(
 		const groups: { [key: string]: Message[] } = {};
 
 		messages.forEach((msg) => {
-			const date = formatDate(msg.sentAt);
+			const date = formatDate(String(msg.sent_at));
 			if (!groups[date]) groups[date] = [];
 			groups[date].push(msg);
 		});

@@ -1,5 +1,7 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Dimensions } from "react-native";
 import { COLORS } from "../../../../shared/ui/colors";
+
+const screenWidth = Dimensions.get("window").width;
 
 export const styles = StyleSheet.create({
 	container: {
@@ -39,19 +41,6 @@ export const styles = StyleSheet.create({
 		fontSize: 16,
 		backgroundColor: "#fff",
 	},
-	sendButton: {
-		backgroundColor: "#007AFF",
-		borderRadius: 20,
-		paddingVertical: 8,
-		paddingHorizontal: 18,
-		justifyContent: "center",
-		alignItems: "center",
-	},
-	sendButtonText: {
-		color: "#fff",
-		fontWeight: "bold",
-		fontSize: 16,
-	},
 	optionDiv: {
 		width: 40,
 		height: 40,
@@ -61,7 +50,6 @@ export const styles = StyleSheet.create({
 		justifyContent: "center",
 		alignItems: "center",
 	},
-
 	submitButton: {
 		height: 40,
 		backgroundColor: COLORS.darkPlum,
@@ -90,7 +78,6 @@ export const styles = StyleSheet.create({
 		flexDirection: "row",
 		alignItems: "flex-end",
 		justifyContent: "center",
-		// backgroundColor: 'black',
 		gap: 10,
 	},
 
@@ -109,7 +96,7 @@ export const styles = StyleSheet.create({
 	myMessage: {
 		alignSelf: "flex-end",
 		flexDirection: "row",
-		maxWidth: "75%",
+		maxWidth: screenWidth * 0.85,
 		marginVertical: 4,
 		gap: 5,
 	},
@@ -117,7 +104,7 @@ export const styles = StyleSheet.create({
 	theirMessage: {
 		alignSelf: "flex-start",
 		flexDirection: "row",
-		maxWidth: "75%",
+		maxWidth: screenWidth * 0.85,
 		marginVertical: 4,
 		gap: 5,
 	},
@@ -129,35 +116,30 @@ export const styles = StyleSheet.create({
 	},
 
 	myMessageText: {
-		minHeight: 40,
 		backgroundColor: COLORS.lightGray,
-		flexDirection: "column",
-		justifyContent: "flex-end",
 		paddingHorizontal: 10,
 		paddingVertical: 8,
-		alignItems: "center",
 		borderRadius: 12,
-		maxWidth: "100%",
+		maxWidth: screenWidth * 0.7,
+		alignSelf: "flex-end",
+		flexShrink: 1,
 	},
 
 	theirMessageText: {
-		minHeight: 40,
 		borderColor: COLORS.lightGray,
 		borderWidth: 1,
-		flexDirection: "column",
-		justifyContent: "flex-start",
 		paddingHorizontal: 10,
 		paddingVertical: 8,
-		alignItems: "center",
 		borderRadius: 12,
-		maxWidth: "100%",
+		maxWidth: screenWidth * 0.7,
+		alignSelf: "flex-start",
+		flexShrink: 1,
 	},
 
 	messageText: {
 		fontSize: 16,
 		fontFamily: "GTWalsheimPro-Regular",
-		flexShrink: 1, 
-		flexWrap: "wrap", 
+		flexWrap: "wrap",
 	},
 
 	messageData: {
@@ -166,8 +148,6 @@ export const styles = StyleSheet.create({
 		alignSelf: "flex-end",
 		marginHorizontal: 5,
 		marginBottom: 5,
-		position: "relative",
-		justifyContent: "flex-end",
 	},
 
 	dateSeparatorContainer: {

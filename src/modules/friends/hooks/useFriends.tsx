@@ -7,15 +7,15 @@ import {
 	ICanceledRequest,
 	IDeletedRequest
 } from "../types/types";
-import { IUser } from "../../auth/types";
 import { SERVER_HOST } from "../../../shared/constants";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { User } from "../../../shared/types";
 
 export function useFriends() {
-	const [friends, setFriends] = useState<IUser[]>([]);
+	const [friends, setFriends] = useState<User[]>([]);
 	const [requests, setRequests] = useState<IRequest[]>([]);
 	const [myRequests, setMyRequests] = useState<IMyRequest[]>([]);
-	const [recommends, setRecommends] = useState<IUser[]>([]);
+	const [recommends, setRecommends] = useState<User[]>([]);
 	const [isLoading, setIsLoading] = useState(false);
 
 	async function getAllFriends() {
@@ -29,7 +29,7 @@ export function useFriends() {
 					Authorization: `Bearer ${token}`,
 				},
 			});
-			const result: Result<IUser[]> = await response.json();
+			const result: Result<User[]> = await response.json();
 			if (result.status === "error") {
 				console.log("getAllFriends error:", result.message);
 				return;
@@ -120,7 +120,7 @@ export function useFriends() {
 				}
 			);
 
-			const result: Result<IUser[]> = await response.json();
+			const result: Result<User[]> = await response.json();
 			if (result.status === "error") {
 				console.log("getRecommends error:", result.message);
 				return;
@@ -136,9 +136,9 @@ export function useFriends() {
 		}
 	}
 
-	async function sendRequest(friendUsername: string) {
+	async function sendRequest(username: string) {
 		try {
-			console.log(`sendRequest called: ${friendUsername}`);
+			console.log(`sendRequest called: ${username}`);
 			const token = await AsyncStorage.getItem("token");
 			const response = await fetch(`${SERVER_HOST}api/friends/send`, {
 				method: "POST",
@@ -146,7 +146,7 @@ export function useFriends() {
 					"Content-Type": "application/json",
 					Authorization: `Bearer ${token}`,
 				},
-				body: JSON.stringify({ username: friendUsername }),
+				body: JSON.stringify({ username }),
 			});
 
 			const result: Result<IFriendRequest> = await response.json();
@@ -160,7 +160,7 @@ export function useFriends() {
 		}
 	}
 
-	async function acceptRequest(friendUsername: string) {
+	async function acceptRequest(username: string) {
 		console.log("acceptRequest called");
 		try {
 			const token = await AsyncStorage.getItem("token");
@@ -170,7 +170,7 @@ export function useFriends() {
 					"Content-Type": "application/json",
 					Authorization: `Bearer ${token}`,
 				},
-				body: JSON.stringify({ username: friendUsername }),
+				body: JSON.stringify({username}),
 			});
 
 			const result: Result<IFriendRequest> = await response.json();

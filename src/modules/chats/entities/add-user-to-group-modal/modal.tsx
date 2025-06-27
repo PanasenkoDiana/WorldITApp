@@ -1,4 +1,11 @@
-import { View, Text, TextInput, FlatList, Image, TouchableOpacity } from "react-native";
+import {
+	View,
+	Text,
+	TextInput,
+	FlatList,
+	Image,
+	TouchableOpacity,
+} from "react-native";
 import { useEffect, useState } from "react";
 import { IAddUserToGroupModalProps } from "./modal.types";
 import { SearchIcon } from "../../../../shared/ui/icons";
@@ -20,9 +27,10 @@ export function AddUserToGroupModal(props: IAddUserToGroupModalProps) {
 
 	const filteredContacts = friends
 		.map((friend) => {
-			const fullName = friend.name && friend.surname
-				? `${friend.name} ${friend.surname}`.toLowerCase()
-				: "";
+			const fullName =
+				friend.first_name && friend.last_name
+					? `${friend.first_name} ${friend.last_name}`.toLowerCase()
+					: "";
 
 			if (lowerInput.includes("@")) {
 				const username = `@${friend.username}`;
@@ -31,8 +39,8 @@ export function AddUserToGroupModal(props: IAddUserToGroupModalProps) {
 			}
 
 			if (
-				friend.name?.toLowerCase().includes(lowerInput) ||
-				friend.surname?.toLowerCase().includes(lowerInput) ||
+				friend.last_name?.toLowerCase().includes(lowerInput) ||
+				friend.last_name?.toLowerCase().includes(lowerInput) ||
 				friend.username.toLowerCase().includes(lowerInput) ||
 				fullName.includes(lowerInput)
 			) {
@@ -44,8 +52,8 @@ export function AddUserToGroupModal(props: IAddUserToGroupModalProps) {
 		.filter((contact) => contact !== null) as typeof friends;
 
 	const sortedContacts = filteredContacts.sort((a, b) => {
-		const nameA = a.name || "";
-		const nameB = b.name || "";
+		const nameA = a.first_name || "";
+		const nameB = b.first_name || "";
 		return nameA.localeCompare(nameB);
 	});
 
@@ -63,7 +71,7 @@ export function AddUserToGroupModal(props: IAddUserToGroupModalProps) {
 		<ModalInCenter visible={props.isVisible} onClose={props.onClose}>
 			<View style={styles.container}>
 				<Text style={styles.title}>Додати учасника</Text>
-				
+
 				<Input
 					style={styles.searchInput}
 					placeholder="Пошук"
@@ -72,15 +80,18 @@ export function AddUserToGroupModal(props: IAddUserToGroupModalProps) {
 					value={searchText}
 				/>
 
-				<Text style={styles.selectText}>Вибрано: {selectedUsers.length}</Text>
+				<Text style={styles.selectText}>
+					Вибрано: {selectedUsers.length}
+				</Text>
 
 				<FlatList
 					data={sortedContacts}
 					keyExtractor={(item) => item.id.toString()}
 					renderItem={({ item }) => {
 						const avatar =
-							item.Profile.avatars?.[item.Profile.avatars.length - 1]
-								?.image?.filename;
+							item.user_app_profile.user_app_avatar[
+								item.user_app_profile.user_app_avatar.length - 1
+							]?.image;
 
 						const isChecked = selectedUsers.includes(item.id);
 
@@ -88,23 +99,37 @@ export function AddUserToGroupModal(props: IAddUserToGroupModalProps) {
 							<View style={styles.userCard}>
 								{avatar ? (
 									<Image
-										source={{ uri: `${SERVER_HOST}media/${avatar}` }}
-										style={{ width: 45, height: 45, borderRadius: 1000 }}
+										source={{
+											uri: `${SERVER_HOST}media/${avatar}`,
+										}}
+										style={{
+											width: 45,
+											height: 45,
+											borderRadius: 1000,
+										}}
 									/>
 								) : (
 									<DefaultAvatar
-										style={{ width: 45, height: 45, borderRadius: 100 }}
+										style={{
+											width: 45,
+											height: 45,
+											borderRadius: 100,
+										}}
 									/>
 								)}
 
 								<Text style={styles.userText}>
-									{item.name} {item.surname}
+									{item.first_name} {item.last_name}
 								</Text>
 
-								<View style={{ position: "absolute", right: 0 }}>
+								<View
+									style={{ position: "absolute", right: 0 }}
+								>
 									<CustomCheckBox.variantTwo
 										checked={isChecked}
-										onToggle={() => toggleSelectUser(item.id)}
+										onToggle={() =>
+											toggleSelectUser(item.id)
+										}
 									/>
 								</View>
 							</View>
@@ -113,7 +138,10 @@ export function AddUserToGroupModal(props: IAddUserToGroupModalProps) {
 				/>
 
 				<View style={styles.buttonsBlock}>
-					<TouchableOpacity style={styles.dismissButton} onPress={props.onClose}>
+					<TouchableOpacity
+						style={styles.dismissButton}
+						onPress={props.onClose}
+					>
 						<Text style={styles.dismissButtonText}>Назад</Text>
 					</TouchableOpacity>
 
@@ -124,7 +152,9 @@ export function AddUserToGroupModal(props: IAddUserToGroupModalProps) {
 							props.onClose();
 						}}
 					>
-						<Text style={styles.saveButtonText}>Зберегти зміни</Text>
+						<Text style={styles.saveButtonText}>
+							Зберегти зміни
+						</Text>
 					</TouchableOpacity>
 				</View>
 			</View>

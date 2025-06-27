@@ -12,9 +12,9 @@ export default function MainLayout() {
 	const selectedPage = pathname?.split("/").filter(Boolean).pop() || "unknown";
 	const { fetchUser } = useUserContext();
 
-	useEffect(() => {
-		fetchUser();
-	}, [pathname]);
+	// useEffect(() => {
+	// 	fetchUser();
+	// }, [pathname]);
 	
 	return (
 		<View style={styles.container}>

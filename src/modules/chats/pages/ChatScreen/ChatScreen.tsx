@@ -21,7 +21,8 @@ import { COLORS } from "../../../../shared/ui/colors";
 import { DefaultAvatar } from "../../../../shared/ui/images";
 import { useRecipient } from "../../hooks/useRecipient";
 import { SERVER_HOST } from "../../../../shared/constants";
-import { Message, useChat } from "../ChatsHook/Chat.hooks";
+import { ChatMessage as Message } from "../../../../shared/types";
+import { useChat } from "../ChatsHook/Chat.hooks";
 
 export function ChatScreen() {
 	const { recipientId, recipientName, recipientUsername } =
@@ -34,13 +35,14 @@ export function ChatScreen() {
 	const router = useRouter();
 	const { getRecipient } = useRecipient();
 
+	// Здесь важно, чтобы useChat возвращал currentUserProfileId — id профиля пользователя
 	const {
 		grouped,
 		newMessage,
 		setNewMessage,
 		sendMessage,
 		thisRecipient,
-		currentUserId,
+		currentUserId, // <- id профиля текущего пользователя (user_app_profile.id)
 	} = useChat(recipientId, recipientUsername, getRecipient);
 
 	const flatListRef = useRef<FlatList>(null);
@@ -67,12 +69,12 @@ export function ChatScreen() {
 							/>
 						</TouchableOpacity>
 						<View style={styles.recipientHeader}>
-							{thisRecipient?.Profile?.avatars?.length ? (
+							{thisRecipient?.user_app_profile?.user_app_avatar?.length ? (
 								<Image
 									source={{
 										uri: `${SERVER_HOST}media/${
-											thisRecipient.Profile.avatars.at(-1)
-												?.image.filename
+											thisRecipient.user_app_profile.user_app_avatar.at(-1)
+												?.image
 										}`,
 									}}
 									style={styles.recipientAvatar}
@@ -81,7 +83,7 @@ export function ChatScreen() {
 								<DefaultAvatar style={styles.recipientAvatar} />
 							)}
 							<Text style={styles.header}>
-								{thisRecipient?.name ?? "Загрузка..."}
+								{thisRecipient?.first_name ?? "Загрузка..."}
 							</Text>
 						</View>
 					</View>
@@ -97,77 +99,90 @@ export function ChatScreen() {
 					data={grouped}
 					keyExtractor={(_, index) => `date-${index}`}
 					contentContainerStyle={{ paddingBottom: 16 }}
-					renderItem={({ item }) => (
-						<Fragment key={item.date}>
-							<View style={styles.dateSeparatorContainer}>
-								<Text style={styles.dateSeparatorText}>
-									{item.date}
-								</Text>
-							</View>
-							{item.data.map((msg: Message) => (
-								<View
-									key={
-										msg.id?.toString() ??
-										Math.random().toString()
-									}
-									style={
-										msg.authorId === currentUserId
-											? styles.myMessage
-											: styles.theirMessage
-									}
-								>
-									{msg.authorId !== currentUserId &&
-									thisRecipient?.Profile?.avatars?.length ? (
-										<Image
-											source={{
-												uri: `${SERVER_HOST}media/${
-													thisRecipient.Profile.avatars.at(
-														-1
-													)?.image.filename
-												}`,
-											}}
-											style={styles.messageAvatar}
-										/>
-									) : (
-										msg.authorId !== currentUserId && (
-											<DefaultAvatar
-												style={styles.messageAvatar}
-											/>
-										)
-									)}
-									<View
-										style={
-											msg.authorId === currentUserId
-												? styles.myMessageText
-												: styles.theirMessageText
-										}
-									>
-										<Text style={styles.messageText}>
-											{msg.content}
-										</Text>
-										<View
-											style={{
-												alignSelf: "flex-end",
-												flexDirection: "row",
-												alignItems: "center",
-												marginTop: 4,
-											}}
-										>
-											<Text style={styles.messageData}>
-												{new Date(
-													msg.sentAt ?? ""
-												).toLocaleTimeString([], {
-													hour: "2-digit",
-													minute: "2-digit",
-												})}
-											</Text>
-											<CheckIcon width={10} height={10} />
-										</View>
-									</View>
+					renderItem={({ item }) => {
+						return (
+							<Fragment key={item.date}>
+								<View style={styles.dateSeparatorContainer}>
+									<Text style={styles.dateSeparatorText}>
+										{item.date}
+									</Text>
 								</View>
-							))}
-						</Fragment>
-					)}
+								{item.data.map((msg: Message) => {
+									const isMyMessage =
+										Number(msg.author_id) === currentUserId;
+									return (
+										<View
+											key={
+												msg.id?.toString() ??
+												Math.random().toString()
+											}
+											style={
+												isMyMessage
+													? styles.myMessage
+													: styles.theirMessage
+											}
+										>
+											{/* Аватар собеседника слева, если не мое сообщение */}
+											{!isMyMessage &&
+											thisRecipient?.user_app_profile
+												?.user_app_avatar?.length ? (
+												<Image
+													source={{
+														uri: `${SERVER_HOST}media/${
+															thisRecipient.user_app_profile.user_app_avatar.at(
+																-1
+															)?.image
+														}`,
+													}}
+													style={styles.messageAvatar}
+												/>
+											) : (
+												!isMyMessage && (
+													<DefaultAvatar
+														style={styles.messageAvatar}
+													/>
+												)
+											)}
+
+											<View
+												style={
+													isMyMessage
+														? styles.myMessageText
+														: styles.theirMessageText
+												}
+											>
+												<Text
+													style={styles.messageText}
+													numberOfLines={10}
+													ellipsizeMode="tail"
+												>
+													{msg.content}
+												</Text>
+												<View
+													style={{
+														alignSelf: "flex-end",
+														flexDirection: "row",
+														alignItems: "center",
+														marginTop: 4,
+													}}
+												>
+													<Text style={styles.messageData}>
+														{new Date(
+															msg.sent_at ?? ""
+														).toLocaleTimeString([], {
+															hour: "2-digit",
+															minute: "2-digit",
+														})}
+													</Text>
+													<CheckIcon width={10} height={10} />
+												</View>
+											</View>
+										</View>
+									);
+								})}
+							</Fragment>
+						);
+					}}
 				/>
 
 				<KeyboardAvoidingView

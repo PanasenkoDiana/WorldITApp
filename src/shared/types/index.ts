@@ -218,7 +218,7 @@ export interface User {
 	groups: UserGroup[];
 	user_permissions: UserPermission[];
 	django_admin_log: DjangoAdminLog[];
-	user_app_profile?: UserAppProfile;
+	user_app_profile: UserAppProfile;
 }
 
 export interface Group {

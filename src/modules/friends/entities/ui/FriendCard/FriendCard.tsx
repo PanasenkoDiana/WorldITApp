@@ -8,11 +8,12 @@ import { useUserContext } from "../../../../auth/context/userContext";
 import { useFriends } from "../../../hooks/useFriends";
 import { SERVER_HOST } from "../../../../../shared/constants";
 import defaultAvatar from "../../../../../../assets/default_avatar.png";
-import { IUser } from "../../../../auth/types";
+
 import { DefaultAvatar } from "../../../../../shared/ui/images";
 import { router } from "expo-router";
+import { User } from "../../../../../shared/types";
 
-interface IFriendCard extends IUser {
+interface IFriendCard extends User {
 	variant: "friend" | "request" | "myRequest" | "notFriend" | string;
 }
 
@@ -33,16 +34,16 @@ export function FriendCard(props: IFriendCard) {
 	return (
 		<View style={styles.container}>
 			<TouchableOpacity style={styles.friendInfo}>
-				{props?.Profile?.avatars?.length > 0 &&
-				props.Profile.avatars[props.Profile.avatars.length - 1]
+				{props.user_app_profile?.user_app_avatar &&
+				props.user_app_profile?.user_app_avatar[props.user_app_profile?.user_app_avatar.length - 1]
 					?.image ? (
 					<Image
 						source={{
 							uri: `${SERVER_HOST}media/${
-								props.Profile.avatars[
-									props.Profile.avatars.length - 1
-								].image.filename
-							}`,
+								props.user_app_profile?.user_app_avatar[
+									props.user_app_profile?.user_app_avatar.length - 1
+								].image
+							}`,	
 						}}
 						style={styles.profileImage}
 					/>
@@ -51,18 +52,18 @@ export function FriendCard(props: IFriendCard) {
 				)}
 
 				<View style={styles.names}>
-					{props.name ? (
+					{props.first_name ? (
 						<>
 							<Text style={styles.name}>
-								{props.name} {props.surname}
+								{props.first_name} {props.last_name}
 							</Text>
 							<Text style={styles.username}>
 								@{props.username}
 							</Text>
 						</>
-					) : props.surname ? (
+					) : props.last_name ? (
 						<>
-							<Text style={styles.name}>{props.surname}</Text>
+							<Text style={styles.name}>{props.last_name}</Text>
 							<Text style={styles.username}>
 								@{props.username}
 							</Text>
@@ -84,8 +85,8 @@ export function FriendCard(props: IFriendCard) {
 									recipientId: props.id,
 									recipientUsername: props.username,
 									recipientName:
-										`${props.name || ""} ${
-											props.surname || ""
+										`${props.first_name || ""} ${
+											props.last_name || ""
 										}`.trim() || `@${props.username}`,
 								},
 							})

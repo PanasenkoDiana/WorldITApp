@@ -6,18 +6,19 @@ import {
 	Image,
 	ScrollView,
 } from "react-native";
-import { Contact } from "../../types/types";
+// import { Contact } from "../../types/types";
 import { styles } from "./ContactsPage.styles";
 import { Input } from "../../../../shared/ui/input";
 import { SearchIcon } from "../../../../shared/ui/icons";
 import { COLORS } from "../../../../shared/ui/colors";
 import { useState } from "react";
-import { IUser } from "../../../auth/types";
+// import { IUser } from "../../../auth/types";
 import { SERVER_HOST } from "../../../../shared/constants";
 import { DefaultAvatar } from "../../../../shared/ui/images";
 import { useRouter } from "expo-router";
+import { User } from "../../../../shared/types";
 interface ContactsPageProps {
-	contacts: IUser[];
+	contacts: User[];
 }
 
 export function ContactsPage(props: ContactsPageProps) {
@@ -29,8 +30,8 @@ export function ContactsPage(props: ContactsPageProps) {
 	const filteredContacts = props.contacts
 		.map((contact) => {
 			const fullName =
-				contact.name && contact.surname
-					? `${contact.name} ${contact.surname}`.toLowerCase()
+				contact.first_name && contact.last_name
+					? `${contact.first_name} ${contact.last_name}`.toLowerCase()
 					: "";
 
 			if (lowerInput.includes("@")) {
@@ -43,10 +44,10 @@ export function ContactsPage(props: ContactsPageProps) {
 				}
 			} else {
 				if (
-					(contact.name &&
-						contact.name.toLowerCase().includes(lowerInput)) ||
-					(contact.surname &&
-						contact.surname.toLowerCase().includes(lowerInput)) ||
+					(contact.first_name &&
+						contact.first_name.toLowerCase().includes(lowerInput)) ||
+					(contact.last_name &&
+						contact.last_name.toLowerCase().includes(lowerInput)) ||
 					contact.username.toLowerCase().includes(lowerInput) ||
 					fullName.includes(lowerInput)
 				) {
@@ -59,10 +60,10 @@ export function ContactsPage(props: ContactsPageProps) {
 		.filter((contact) => contact !== null);
 
 	const sortedContacts = filteredContacts.sort((a, b) => {
-		const nameA = a.name || "";
-		const nameB = b.name || "";
-		const surnameA = a.surname || "";
-		const surnameB = b.surname || "";
+		const nameA = a.first_name || "";
+		const nameB = b.first_name || "";
+		const surnameA = a.last_name || "";
+		const surnameB = b.last_name || "";
 		const usernameA = a.username || "";
 		const usernameB = b.username || "";
 
@@ -99,27 +100,28 @@ export function ContactsPage(props: ContactsPageProps) {
 				renderItem={({ item }) => (
 					<TouchableOpacity
 						style={styles.contact}
-						onPress={() =>
+						onPress={() => {
+							console.log('bebroy: ', item)
 							router.push( {
 								pathname:"/chat",
 								params:{
 								recipientId: item.id,
 								recipientUsername: item.username,
 								recipientName: `${
-									item.name || ""
-								} ${item.surname || ""}`.trim() || `@${item.username}`,},
-							})
+									item.first_name || ""
+								} ${item.last_name || ""}`.trim() || `@${item.username}`,},
+							})}
 						}
 					>
-						{item?.Profile?.avatars?.length > 0 &&
-						item.Profile.avatars[item.Profile.avatars.length - 1]
+						{item.user_app_profile.user_app_avatar.length > 0 &&
+						item.user_app_profile.user_app_avatar[item.user_app_profile.user_app_avatar.length - 1]
 							?.image ? (
 							<Image
 								source={{
 									uri: `${SERVER_HOST}media/${
-										item.Profile.avatars[
-											item.Profile.avatars.length - 1
-										].image.filename
+										item.user_app_profile.user_app_avatar[
+											item.user_app_profile.user_app_avatar.length - 1
+										].image
 									}`,
 								}}
 								style={styles.contactImage}
@@ -128,11 +130,11 @@ export function ContactsPage(props: ContactsPageProps) {
 							<DefaultAvatar style={styles.contactImage} />
 						)}
 						<View style={styles.contactInfo}>
-							{item.name || item.surname ? (
-								item.name ? (
+							{item.first_name || item.last_name ? (
+								item.first_name ? (
 									<>
 										<Text style={styles.contactName}>
-											{item.name} {item.surname || ""}
+											{item.first_name} {item.last_name || ""}
 										</Text>
 										<Text style={styles.contactUsername}>
 											@{item.username}
@@ -141,7 +143,7 @@ export function ContactsPage(props: ContactsPageProps) {
 								) : (
 									<>
 										<Text style={styles.contactName}>
-											{item.surname}
+											{item.last_name}
 										</Text>
 										<Text style={styles.contactUsername}>
 											@{item.username}

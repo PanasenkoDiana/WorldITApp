@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { SERVER_HOST } from "../../../shared/constants";
-import { IUser } from "../../auth/types";
+import { User } from "../../../shared/types";
 
 export function useRecipient() {
-    const [recipient, setRecipient] = useState<IUser | null >(null);
+    const [recipient, setRecipient] = useState<User | null >(null);
 
     async function getRecipient(id: number) {
         try {

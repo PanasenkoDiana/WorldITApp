@@ -6,7 +6,7 @@ import { AlbumImage } from "../album-image";
 import { SERVER_HOST } from "../../../../../shared/constants";
 import { styles } from "./card.styles";
 import { Ionicons } from "@expo/vector-icons";
-import { IAlbum } from "../../../types";
+import { PostAlbum } from "../../../../../shared/types"
 import {
 	launchImageLibraryAsync,
 	MediaTypeOptions,
@@ -18,7 +18,7 @@ import { UpdateAlbumModal } from "../create-album-modal";
 import { useDeleteAlbumPhoto } from "../../../hooks/useDeleteAlbumPhoto";
 import { useDeleteAlbum } from "../../../hooks/useDeleteAlbum";
 
-export function AlbumCard(props: IAlbum) {
+export function AlbumCard(props: PostAlbum) {
 	const { refetch } = useAddAlbumPhoto();
 	const [dotsModalVisible, setDotsModalVisible] = useState(false);
 	const [menuPosition, setMenuPosition] = useState({ top: 0, right: 0 });
@@ -28,8 +28,8 @@ export function AlbumCard(props: IAlbum) {
 	const { deleteFunction: deleteAlbumFunction } = useDeleteAlbum();
 
 	useEffect(() => {
-		console.log(props.topic?.name);
-	}, [props.topic]);
+		console.log(props.post_app_tag);
+	}, [props.post_app_tag]);
 
 	const openMenu = () => {
 		if (threeDotsRef.current) {
@@ -132,10 +132,10 @@ export function AlbumCard(props: IAlbum) {
 			<View style={{ width: "100%", gap: 10 }}>
 				<View style={styles.albumTextInfo}>
 					<Text style={styles.albumTextInfoTheme}>
-						{props.topic?.name}
+						{props.name}
 					</Text>
 					<Text style={styles.albumTextInfoYear}>
-						{formatDate(props.createdAt)}
+						{formatDate(Number(props.created_at))}
 					</Text>
 				</View>
 				<View style={styles.albumPhotosList}>
@@ -147,13 +147,13 @@ export function AlbumCard(props: IAlbum) {
 							gap: 10,
 							flexDirection: "row",
 						}}
-						data={props.images}
+						data={props.post_app_album_images}
 						keyExtractor={(item) => item.id.toString()}
 						renderItem={({ item }) => (
 							<AlbumImage.Small
-								image={`${SERVER_HOST}media/${item.file}`}
+								image={`${SERVER_HOST}media/${item.post_app_image}`}
 								deleteFunction={deleteFunction}
-								id={item.id}
+								id={Number(item.image_id)}
 							/>
 						)}
 						ListFooterComponent={() => (
@@ -163,7 +163,7 @@ export function AlbumCard(props: IAlbum) {
 									if (!base64) return;
 									await refetch({
 										image: base64,
-										id: props.id,
+										id: Number(props.id),
 									});
 								}}
 							/>
@@ -243,7 +243,7 @@ export function AlbumCard(props: IAlbum) {
 								alignItems: "center",
 								paddingVertical: 8,
 							}}
-							onPress={() => deleteAlbumFunction(props.id)}
+							onPress={() => deleteAlbumFunction(Number(props.id))}
 						>
 							<Ionicons
 								name="trash-outline"
@@ -261,12 +261,11 @@ export function AlbumCard(props: IAlbum) {
 
 			{updateModalVisible && (
 				<UpdateAlbumModal
-					id={props.id}
+					id={Number(props.id)}
 					isVisible={updateModalVisible}
 					onClose={() => setUpdateModalVisible(false)}
 					name={props.name}
-					topic={props.topic}
-					createdAt={props.createdAt}
+					createdAt={props.created_at.getTime()}
 				/>
 			)}
 		</View>

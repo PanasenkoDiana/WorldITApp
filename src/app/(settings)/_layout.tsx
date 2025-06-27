@@ -10,9 +10,9 @@ export default function ModalsLayout() {
     const selectedPage = pathname?.split("/").filter(Boolean).pop() || "unknown";
 	const { fetchUser } = useUserContext();
 
-	useEffect(() => {
-		fetchUser();
-	}, [pathname]);
+	// useEffect(() => {
+	// 	fetchUser();
+	// }, [pathname]);
 
 	return (
 		<View style={{ flex: 1 }}>

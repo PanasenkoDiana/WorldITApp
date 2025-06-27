@@ -6,6 +6,7 @@ import { COLORS } from "../../shared/ui/colors";
 import { LoginForm } from "../../modules/auth/ui";
 import { useEffect } from "react";
 import { WelcomeBlock } from "../../modules/auth/ui";
+
 export default function Login() {
     return (
         <View style={{ flex: 1, backgroundColor: COLORS.plum }}>

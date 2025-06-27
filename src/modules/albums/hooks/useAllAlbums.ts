@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react"
-import { IAlbum } from "../types"
+import { PostAlbum } from "../../../shared/types"
 import { SERVER_HOST } from "../../../shared/constants"
 import { Result } from "../../../shared/types/result"
 import { useUserContext } from "../../auth/context/userContext"
 
 export function useAllAlbums(){
-    const [ albums, setAlbums ] = useState<IAlbum[] | null>(null)
+    const [ albums, setAlbums ] = useState<PostAlbum[] | null>(null)
     const [ isLoading, setIsLoading ] = useState<boolean>(false)
     const [ error, setError ] = useState<string | null>(null)
 	const { getToken } = useUserContext()
@@ -17,7 +17,7 @@ export function useAllAlbums(){
             const response = await fetch(`${SERVER_HOST}api/albums/all`, {
 				headers: { Authorization: `Bearer ${token}` },
 			})
-            const result: Result<IAlbum[]> = await response.json();
+            const result: Result<PostAlbum[]> = await response.json();
 			if (result.status === "error") {
 				console.log(result.message);
 				setError(result.message)
@@ -37,10 +37,9 @@ export function useAllAlbums(){
 		}
     }
 
-    useEffect(()=>{
-        getAlbums()
-    }, [])
-
+    // useEffect(()=>{
+    //     getAlbums()
+    // }, [])
 
     return { albums, isLoading, error, refetch: getAlbums }
 }

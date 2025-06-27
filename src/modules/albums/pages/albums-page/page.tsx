@@ -32,7 +32,7 @@ import { useAllAlbums } from "../../hooks/useAllAlbums";
 export function Albums() {
   const { user } = useUserContext();
   const [refresh, setRefresh] = useState(false);
-  const avatars = user?.Profile.avatars;
+  const avatars = user?.user_app_profile.user_app_avatar;
 
   const { albums, refetch } = useAllAlbums();
   const [modalVisible, setModalVisible] = useState(false);
@@ -87,11 +87,7 @@ export function Albums() {
       contentContainerStyle={{ paddingBottom: 20, gap: 15 }}
       renderItem={({ item }) => (
         <AlbumCard
-          id={item.id}
-          name={item.name}
-          topic={item.topic}
-          createdAt={item.createdAt}
-          images={item.images}
+          {...item}
         />
       )}
     />
