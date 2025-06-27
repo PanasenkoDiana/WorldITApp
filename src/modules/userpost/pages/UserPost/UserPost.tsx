@@ -54,15 +54,17 @@ export default function UserPost(props: {
 				ListHeaderComponent={props.haveHeader ? <Main /> : null}
 				renderItem={({ item }) => (
 					<PostCard
-						id={item.id}
-						author={item.author}
+						id={BigInt(item.id)}
+						topic={item.topic}
+						author_id={item.author_id}
+						user_app_profile={item.user_app_profile}
 						title={item.title}
 						content={item.content}
-						links={item.links}
-						tags={item.tags}
-						images={item.images}
-						likes={item.likes}
-						views={item.views}
+						post_app_link={item.post_app_link}
+						post_app_post_tags={item.post_app_post_tags}
+						post_app_post_images={item.post_app_post_images}
+						post_app_post_likes={item.post_app_post_likes}
+						post_app_post_views={item.post_app_post_views}
 						onRefresh={onRefresh}
 					/>
 				)}

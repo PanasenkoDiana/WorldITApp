@@ -1,20 +1,20 @@
 import { useEffect, useState } from "react";
 import { ICreatePost, IPostForm } from "../types";
-import { IPost } from '../types/post'
+import { Post } from '../../../shared/types'
 import { SERVER_HOST } from "../../../shared/constants";
 import { Result } from "../../../shared/types/result";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export function usePost() {
-	const [posts, setPosts] = useState<IPost[]>([]);
-	const [myPosts, setMyPosts] = useState<IPost[]>([]);
+	const [posts, setPosts] = useState<Post[]>([]);
+	const [myPosts, setMyPosts] = useState<Post[]>([]);
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [refresh, setRefresh] = useState(false);
 
 	async function createPost(
 		data: IPostForm
-	): Promise<Result<IPost> | undefined> {
+	): Promise<Result<Post> | undefined> {
 		try {
 			console.log(data)
 			const token = await AsyncStorage.getItem("token");
@@ -27,7 +27,7 @@ export function usePost() {
 				body: JSON.stringify(data),
 			});
 
-			const result: Result<IPost> = await response.json();
+			const result: Result<Post> = await response.json();
 
 			if (result.status === "error") {
 				setError(result.message);
@@ -44,11 +44,11 @@ export function usePost() {
 		}
 	}
 
-	async function getAllPosts(): Promise<Result<IPost[]> | undefined> {
+	async function getAllPosts(): Promise<Result<Post[]> | undefined> {
 		try {
 			setIsLoading(true);
 			const response = await fetch(`${SERVER_HOST}api/posts/all`);
-			const result: Result<IPost[]> = await response.json();
+			const result: Result<Post[]> = await response.json();
 
 			if (result.status === "error") {
 				setError(result.message);
@@ -67,7 +67,7 @@ export function usePost() {
 		}
 	}
 
-	async function getMyPosts(): Promise<Result<IPost[]> | undefined> {
+	async function getMyPosts(): Promise<Result<Post[]> | undefined> {
 		try {
 			setIsLoading(true);
 			const token = await AsyncStorage.getItem("token");
@@ -77,7 +77,7 @@ export function usePost() {
 					Authorization: `Bearer ${token}`,
 				},
 			});
-			const result: Result<IPost[]> = await response.json();
+			const result: Result<Post[]> = await response.json();
 
 			if (result.status === "error") {
 				setError(result.message);
@@ -96,10 +96,10 @@ export function usePost() {
 		}
 	}
 
-	async function getPost(id: number): Promise<Result<IPost> | undefined> {
+	async function getPost(id: number): Promise<Result<Post> | undefined> {
 		try {
 			const response = await fetch(`${SERVER_HOST}api/posts/${id}`);
-			const result: Result<IPost> = await response.json();
+			const result: Result<Post> = await response.json();
 
 			if (result.status === "error") {
 				setError(result.message);
@@ -134,8 +134,8 @@ export function usePost() {
 				return result;
 			}
 
-			setPosts((prev) => prev.filter((post) => post.id !== id));
-			setMyPosts((prev) => prev.filter((post) => post.id !== id));
+			setPosts((prev) => prev.filter((post) => post.id !== BigInt(id)));
+			setMyPosts((prev) => prev.filter((post) => post.id !== BigInt(id)));
 			return result;
 		} catch (error) {
 			console.error("Delete Post Exception:", error);
@@ -145,7 +145,7 @@ export function usePost() {
 
 	async function changePost(
 		data: IPostForm
-	): Promise<Result<IPost> | undefined> {
+	): Promise<Result<Post> | undefined> {
 		try {
 			const token = await AsyncStorage.getItem("token");
 			const response = await fetch(`${SERVER_HOST}api/posts/change`, {
@@ -157,7 +157,7 @@ export function usePost() {
 				body: JSON.stringify(data),
 			});
 
-			const result: Result<IPost> = await response.json();
+			const result: Result<Post> = await response.json();
 
 			if (result.status === "error") {
 				setError(result.message);
@@ -182,10 +182,6 @@ export function usePost() {
 			return { status: "error", message: "An unexpected error occurred" };
 		}
 	}
-
-	useEffect(() => {
-		getAllPosts();
-	}, []);
 
 	return {
 		posts,

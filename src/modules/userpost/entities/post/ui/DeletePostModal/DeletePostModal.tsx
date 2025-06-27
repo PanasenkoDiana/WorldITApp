@@ -4,7 +4,7 @@ import { styles } from "./DeletePostModal.style";
 import { usePost } from "../../../../hooks/usePost";
 
 interface IDeletePostModal {
-	id: number;
+	id: bigint;
 	title: string;
 	isVisible: boolean;
 	onClose: () => void;

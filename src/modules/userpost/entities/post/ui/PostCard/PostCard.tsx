@@ -16,12 +16,12 @@ import { SERVER_HOST } from "../../../../../../shared/constants";
 import { useUserContext } from "../../../../../auth/context/userContext";
 import { IUser } from "../../../../../auth/types";
 import { usePost } from "../../../../hooks";
-import { IPost } from "../../../../types/post";
+import { Post } from "../../../../../../shared/types";
 import { DeletePostModal } from "../DeletePostModal";
 import { Link } from "expo-router";
 import { DefaultAvatar } from "../../../../../../shared/ui/images";
 
-interface IPostCardProps extends IPost {
+interface IPostCardProps extends Post {
 	onRefresh: () => void;
 }
 
@@ -55,17 +55,23 @@ export function PostCard(props: IPostCardProps) {
 		}
 	};
 
+	// Определяем, существует ли аватар и получаем последний
+	const userAvatar =
+		props.user_app_profile.user_app_avatar &&
+		props.user_app_profile.user_app_avatar.length > 0
+			? props.user_app_profile.user_app_avatar[
+					props.user_app_profile.user_app_avatar.length - 1
+			  ]
+			: null;
+
 	return (
 		<View style={styles.cardContainer}>
 			<View style={styles.userInfo}>
-				{props.author.Profile.avatars ? (
+				{/* Используем переменную userAvatar здесь */}
+				{userAvatar ? (
 					<Image
 						source={{
-							uri: `${SERVER_HOST}media/${
-								props.author.Profile.avatars[
-									props.author.Profile.avatars.length - 1
-								].image.filename
-							}`,
+							uri: `${SERVER_HOST}media/${userAvatar.image}`,
 						}}
 						style={styles.avatar}
 					/>
@@ -74,24 +80,25 @@ export function PostCard(props: IPostCardProps) {
 				)}
 
 				<View>
-					{props.author?.name || props.author?.surname ? (
-						props.author?.name ? (
+					{props.user_app_profile.auth_user.first_name ||
+					props.user_app_profile.auth_user.last_name ? (
+						props.user_app_profile.auth_user.first_name ? (
 							<>
 								<Text style={styles.fullName}>
-									{props.author?.name}{" "}
-									{props.author?.surname || ""}
+									{props.user_app_profile.auth_user.first_name}{" "}
+									{props.user_app_profile.auth_user.last_name || ""}
 								</Text>
 							</>
 						) : (
 							<>
 								<Text style={styles.fullName}>
-									{props.author?.surname}
+									{props.user_app_profile.auth_user.last_name}
 								</Text>
 							</>
 						)
 					) : (
 						<Text style={styles.fullName}>
-							@{props.author?.username}
+							@{props.user_app_profile.auth_user.username}
 						</Text>
 					)}
 				</View>
@@ -112,107 +119,123 @@ export function PostCard(props: IPostCardProps) {
 				<Text style={styles.postTitle}>{props.title}</Text>
 				<View style={styles.textInfo}>
 					<Text style={styles.postDescription}>{props.content}</Text>
-					{props.tags && props.tags.length > 0 && (
-						<Text style={styles.postTags}>
-							{props.tags?.map((tag) => `${tag.name} `)}
-						</Text>
-					)}
+					{props.post_app_post_tags &&
+						props.post_app_post_tags.length > 0 && (
+							<Text style={styles.postTags}>
+								{props.post_app_post_tags?.map(
+									(tag) => `${tag.post_app_tag.name} `
+								)}
+							</Text>
+						)}
 				</View>
 				<View>
-					{props.images && props.images.length > 0 && (
-						<View style={styles.images}>
-							<View style={styles.imageGrid}>
-								{props.images.slice(0, 3).map((image) => {
-									const imagesCount = props.images?.length;
+					{props.post_app_post_images &&
+						props.post_app_post_images.length > 0 && (
+							<View style={styles.images}>
+								<View style={styles.imageGrid}>
+									{props.post_app_post_images
+										.slice(0, 3)
+										.map((image) => {
+											const imagesCount =
+												props.post_app_post_images?.length;
 
-									let imageStyle = styles.gridImage;
-									if (imagesCount === 1)
-										imageStyle = styles.fullWidthImage;
-									else if (imagesCount === 2)
-										imageStyle = styles.halfWidthImage;
+											let imageStyle = styles.gridImage;
+											if (imagesCount === 1)
+												imageStyle = styles.fullWidthImage;
+											else if (imagesCount === 2)
+												imageStyle = styles.halfWidthImage;
 
-									return (
-										<Image
-											key={image.id}
-											source={{
-												uri: `${SERVER_HOST}media/${image.filename}`,
-											}}
-											style={imageStyle}
-											resizeMode="cover"
-										/>
-									);
-								})}
+											return (
+												<Image
+													key={image.id}
+													source={{
+														uri: `${SERVER_HOST}media/${image.post_app_image.filename}`,
+													}}
+													style={imageStyle}
+													resizeMode="cover"
+												/>
+											);
+										})}
+								</View>
+
+								<View style={styles.imageGrid}>
+									{props.post_app_post_images
+										.slice(4, 7)
+										.map((image) => {
+											const imagesCount =
+												props.post_app_post_images?.length;
+
+											let imageStyle = styles.gridImage;
+											if (imagesCount === 1)
+												imageStyle = styles.fullWidthImage;
+											else if (imagesCount === 2)
+												imageStyle = styles.halfWidthImage;
+
+											return (
+												<Image
+													key={image.id}
+													source={{
+														uri: `${SERVER_HOST}media/${image.post_app_image.filename}`,
+													}}
+													style={imageStyle}
+													resizeMode="cover"
+												/>
+											);
+										})}
+								</View>
+								<View style={styles.imageGrid}>
+									{props.post_app_post_images
+										.slice(6, 9)
+										.map((image) => {
+											const imagesCount =
+												props.post_app_post_images?.length;
+
+											let imageStyle = styles.gridImage;
+											if (imagesCount === 1)
+												imageStyle = styles.fullWidthImage;
+											else if (imagesCount === 2)
+												imageStyle = styles.halfWidthImage;
+
+											return (
+												<Image
+													key={image.id}
+													source={{
+														uri: `${SERVER_HOST}media/${image.post_app_image.filename}`,
+													}}
+													style={imageStyle}
+													resizeMode="cover"
+												/>
+											);
+										})}
+								</View>
+
+								<View style={styles.imageGrid}>
+									{props.post_app_post_images
+										.slice(9)
+										.map((image) => {
+											const imagesCount =
+												props.post_app_post_images?.length;
+
+											let imageStyle = styles.gridImage;
+											if (imagesCount === 1)
+												imageStyle = styles.fullWidthImage;
+											else if (imagesCount === 2)
+												imageStyle = styles.halfWidthImage;
+
+											return (
+												<Image
+													key={image.id}
+													source={{
+														uri: `${SERVER_HOST}media/${image.post_app_image.filename}`,
+													}}
+													style={imageStyle}
+													resizeMode="cover"
+												/>
+											);
+										})}
+								</View>
 							</View>
-
-							<View style={styles.imageGrid}>
-								{props.images.slice(4, 7).map((image) => {
-									const imagesCount = props.images?.length;
-
-									let imageStyle = styles.gridImage;
-									if (imagesCount === 1)
-										imageStyle = styles.fullWidthImage;
-									else if (imagesCount === 2)
-										imageStyle = styles.halfWidthImage;
-
-									return (
-										<Image
-											key={image.id}
-											source={{
-												uri: `${SERVER_HOST}media/${image.filename}`,
-											}}
-											style={imageStyle}
-											resizeMode="cover"
-										/>
-									);
-								})}
-							</View>
-							<View style={styles.imageGrid}>
-								{props.images.slice(6, 9).map((image) => {
-									const imagesCount = props.images?.length;
-
-									let imageStyle = styles.gridImage;
-									if (imagesCount === 1)
-										imageStyle = styles.fullWidthImage;
-									else if (imagesCount === 2)
-										imageStyle = styles.halfWidthImage;
-
-									return (
-										<Image
-											key={image.id}
-											source={{
-												uri: `${SERVER_HOST}media/${image.filename}`,
-											}}
-											style={imageStyle}
-											resizeMode="cover"
-										/>
-									);
-								})}
-							</View>
-
-							<View style={styles.imageGrid}>
-								{props.images.slice(9).map((image) => {
-									const imagesCount = props.images?.length;
-
-									let imageStyle = styles.gridImage;
-									if (imagesCount === 1)
-										imageStyle = styles.fullWidthImage;
-									else if (imagesCount === 2)
-										imageStyle = styles.halfWidthImage;
-
-									return (
-										<Image
-											key={image.id}
-											source={{
-												uri: `${SERVER_HOST}media/${image.filename}`,
-											}}
-											style={imageStyle}
-											resizeMode="cover"
-										/>
-									);
-								})}
-							</View>
-						</View>
-					)}
+						)}
 
 					<View style={styles.statsContainer}>
 						<View style={styles.statItem}>
@@ -222,7 +245,7 @@ export function PostCard(props: IPostCardProps) {
 								color={COLORS.black}
 							/>
 							<Text style={styles.statLabel}>
-								{props.likes?.length || 0} вподобань
+								{props.post_app_post_likes?.length || 0} вподобань
 							</Text>
 						</View>
 						<View style={styles.statItem}>
@@ -232,7 +255,7 @@ export function PostCard(props: IPostCardProps) {
 								color={COLORS.black}
 							/>
 							<Text style={styles.statLabel}>
-								{props.views?.length || 0} переглядів
+								{props.post_app_post_views?.length || 0} переглядів
 							</Text>
 						</View>
 					</View>

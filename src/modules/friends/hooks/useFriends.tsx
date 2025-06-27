@@ -137,8 +137,8 @@ export function useFriends() {
 	}
 
 	async function sendRequest(friendUsername: string) {
-		console.log("sendRequest called");
 		try {
+			console.log(`sendRequest called: ${friendUsername}`);
 			const token = await AsyncStorage.getItem("token");
 			const response = await fetch(`${SERVER_HOST}api/friends/send`, {
 				method: "POST",
