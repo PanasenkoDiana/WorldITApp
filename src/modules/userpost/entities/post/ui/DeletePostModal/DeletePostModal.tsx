@@ -2,6 +2,7 @@ import { View, Text, TouchableOpacity } from "react-native";
 import { Modal } from "../../../../../../shared/ui/modal";
 import { styles } from "./DeletePostModal.style";
 import { usePost } from "../../../../hooks/usePost";
+import { Alert } from "react-native";
 
 interface IDeletePostModal {
 	id: bigint;
@@ -15,15 +16,21 @@ interface IDeletePostModal {
 export function DeletePostModal(props: IDeletePostModal) {
 	const { deletePost } = usePost();
 
-	async function onSubmit(id: number) {
+	async function onSubmit(id: any) {
 		props.onClose();
-		try {
-			await deletePost(id);
-			props.onRefresh()
-			props.setStatus(1);
-		} catch (error) {
-			props.setStatus(2);
+		const result = await deletePost(id);
+		// try {
+		
+		if (result?.status == "success") {
+			props.onRefresh();
+			Alert.alert("Пост успішно видален!");
+		} else {
+			Alert.alert("Помилка!", result?.message);
 		}
+
+		// } catch (error) {
+		// 	props.setStatus(2);
+		// }
 	}
 
 	// if (!user) {
@@ -70,9 +77,7 @@ export function DeletePostModal(props: IDeletePostModal) {
 					>
 						<Text
 							style={[styles.rightButtonText, styles.text]}
-							onPress={() =>
-								onSubmit(props.id)
-							}
+							onPress={() => onSubmit(props.id)}
 						>
 							Підтвердити
 						</Text>

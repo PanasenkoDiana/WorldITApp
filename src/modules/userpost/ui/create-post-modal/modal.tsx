@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
 	View,
 	Text,
@@ -27,7 +27,7 @@ interface ICreatePostModalProps {
 
 export function CreatePostModal({ isVisible, onClose }: ICreatePostModalProps) {
 	const { createPost, getAllPosts, getMyPosts } = usePost();
-	const { tags } = useAllTags();
+	const { tags, allTags } = useAllTags();
 	const [selectedBase64Images, setSelectedBase64Images] = useState<string[]>(
 		[]
 	);
@@ -105,6 +105,10 @@ export function CreatePostModal({ isVisible, onClose }: ICreatePostModalProps) {
 			Alert.alert("Error", "Unexpected error occurred");
 		}
 	}
+
+	useEffect(() => {
+		allTags()
+	}, [])
 
 	return (
 		<Modal

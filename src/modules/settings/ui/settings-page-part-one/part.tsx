@@ -15,7 +15,8 @@ import { Controller, useForm } from "react-hook-form";
 
 export function SettingsPagePartOne() {
     const { user, changeUserPartOne } = useUserContext();
-    const [isRedact, setIsRedact] = useState(false);
+    const [isRedact, setIsRedact] = useState<boolean>(false);
+    const [isSubmit, setIsSubmit] = useState<boolean>(false)
     const [image, setImage] = useState<string | null>(null);
 
     const { control, handleSubmit, setValue } = useForm<IChangeUserPartOne>({
@@ -78,12 +79,14 @@ export function SettingsPagePartOne() {
 
     useEffect(() => {
         const submitIfNeeded = async () => {
-            if (!isRedact) {
+            if (!isRedact && isSubmit) {
                 await handleSubmit(onSubmit)();
+                setIsSubmit(false)
             }
+            if (isRedact) {setIsSubmit(true)}
         };
         submitIfNeeded();
-    }, [isRedact, handleSubmit]);
+    }, [isRedact]);
 
     return (
         <View style={styles.changeSettingsBlock}>

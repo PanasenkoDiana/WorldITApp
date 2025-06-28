@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { SERVER_HOST } from "../../../shared/constants";
 import { useUserContext } from "../../auth/context/userContext";
-import { IGroupForm } from "../entities/create-group-chat-modal/modal.types";
 import { ChatGroup } from "../../../shared/types";
 
 export function useAllChats() {
@@ -17,15 +16,12 @@ export function useAllChats() {
 			});
 
 			const result = await response.json();
-
-			setChats(result);
+			setChats(result as ChatGroup[]);
 			return response;
 		} catch (err) {
-			console.log(err);
+			console.error("Error loading chats", err);
 		}
 	}
-
-	// const chats
 
 	return { chats, getAllChats };
 }

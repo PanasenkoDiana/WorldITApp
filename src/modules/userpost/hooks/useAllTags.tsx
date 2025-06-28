@@ -8,7 +8,6 @@ export function useAllTags(){
 	const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-
     async function allTags() {
         try {
 			setIsLoading(true);

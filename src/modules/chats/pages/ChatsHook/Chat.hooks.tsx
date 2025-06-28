@@ -3,6 +3,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { io, Socket } from "socket.io-client";
 import { SERVER_HOST } from "../../../../shared/constants";
 import { ChatMessage as Message, User } from "../../../../shared/types";
+import { ProfileWithUser } from "../../../auth/types";
 
 const SOCKET_URL = SERVER_HOST;
 
@@ -22,13 +23,15 @@ export type GroupedMessage = {
 export function useChat(
 	recipientId?: string,
 	recipientUsername?: string,
-	getRecipient?: (id: number) => Promise<{ data?: User | null }>
+	getRecipient?: (id: number) => Promise<{ data?: ProfileWithUser | null }>
 ) {
 	const [messages, setMessages] = useState<Message[]>([]);
 	const [newMessage, setNewMessage] = useState("");
 	const [chatGroupId, setChatGroupId] = useState<number | null>(null);
 	const [currentUserId, setCurrentUserId] = useState<number | null>(null);
-	const [thisRecipient, setThisRecipient] = useState<User | null>(null);
+	const [thisRecipient, setThisRecipient] = useState<ProfileWithUser | null>(
+		null
+	);
 	const socketRef = useRef<Socket | null>(null);
 
 	const savedRecipientUsername = useRef<string | undefined>(undefined);
@@ -83,7 +86,9 @@ export function useChat(
 						method: "POST",
 						headers: {
 							"Content-Type": "application/json",
-							...(token ? { Authorization: `Bearer ${token}` } : {}),
+							...(token
+								? { Authorization: `Bearer ${token}` }
+								: {}),
 						},
 						body: JSON.stringify({ recipientId }),
 					}
@@ -113,7 +118,9 @@ export function useChat(
 					`${SERVER_HOST}api/chats/messages/${chatGroupId}`,
 					{
 						headers: {
-							...(token ? { Authorization: `Bearer ${token}` } : {}),
+							...(token
+								? { Authorization: `Bearer ${token}` }
+								: {}),
 						},
 					}
 				);
@@ -156,11 +163,14 @@ export function useChat(
 		socketRef.current.on("group_message", (msg: any) => {
 			// Приводим к числу для сравнения
 			if (Number(msg.chat_group_id) === chatGroupId) {
-				setMessages((prev) => [...prev, {
-					...msg,
-					author_id: Number(msg.author_id),
-					chat_group_id: Number(msg.chat_group_id),
-				}]);
+				setMessages((prev) => [
+					...prev,
+					{
+						...msg,
+						author_id: Number(msg.author_id),
+						chat_group_id: Number(msg.chat_group_id),
+					},
+				]);
 			}
 		});
 
@@ -193,22 +203,11 @@ export function useChat(
 			return;
 		}
 
-		const msgObj = await response.json();
-
-		const formattedMessage = {
-			id: msgObj.id,
-			content: msgObj.content,
-			author_id: Number(msgObj.author_id), // исправлено на author_id
-			chat_group_id: Number(msgObj.chat_group_id),
-			sent_at: msgObj.sent_at,
-			user_app_profile: msgObj.user_app_profile,
-		};
-
+		// Не надо локально добавлять сообщение!
 		setNewMessage("");
 
-		socketRef.current?.emit("group_message", formattedMessage);
+		// Ждем, пока сервер сам разошлет его через Socket.io
 	};
-
 	function formatTime(isoString?: string): string {
 		if (!isoString) return "";
 		const date = new Date(isoString);

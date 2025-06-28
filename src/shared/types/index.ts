@@ -28,6 +28,7 @@ export interface ChatGroupMember {
 export interface ChatMessage {
 	id: bigint;
 	content: string;
+	sender_id: Number;
 	sent_at: Date;
 	author_id: bigint;
 	chat_group_id: bigint;

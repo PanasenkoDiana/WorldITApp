@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { ICreatePost, IPostForm } from "../types";
-import { Post } from '../../../shared/types'
+import { Post } from "../../../shared/types";
 import { SERVER_HOST } from "../../../shared/constants";
 import { Result } from "../../../shared/types/result";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -16,7 +16,7 @@ export function usePost() {
 		data: IPostForm
 	): Promise<Result<Post> | undefined> {
 		try {
-			console.log(data)
+			console.log(data);
 			const token = await AsyncStorage.getItem("token");
 			const response = await fetch(`${SERVER_HOST}api/posts/create`, {
 				method: "POST",
@@ -114,16 +114,20 @@ export function usePost() {
 		}
 	}
 
-	async function deletePost(id: number): Promise<Result<string> | undefined> {
+	async function deletePost(id: bigint): Promise<Result<string> | undefined> {
 		try {
 			const token = await AsyncStorage.getItem("token");
+			const numberId = Number(id);
+
+			console.log("deletePost id" + numberId);
+
 			const response = await fetch(`${SERVER_HOST}api/posts/delete`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
 					Authorization: `Bearer ${token}`,
 				},
-				body: JSON.stringify({ id }),
+				body: JSON.stringify({ numberId }),
 			});
 
 			const result: Result<string> = await response.json();

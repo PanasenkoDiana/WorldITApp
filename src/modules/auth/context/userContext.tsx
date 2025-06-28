@@ -86,9 +86,9 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
 	useEffect(() => {
 		AsyncStorage.setItem('token', `${token}`)
 	}, [token])
-	useEffect(() => {
-		console.log("user:",user)
-	}, [user])
+	// useEffect(() => {
+	// 	console.log("user:",user)
+	// }, [user])
 
 	async function fetchUser() {
 		const token = await AsyncStorage.getItem("token");

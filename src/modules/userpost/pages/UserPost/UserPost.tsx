@@ -19,7 +19,9 @@ export default function UserPost(props: {
 		getMyPosts,
 	} = usePost();
 
-	const data = props.isMyPosts ? myPosts.slice().reverse() : posts.slice().reverse();
+	const data = props.isMyPosts
+		? myPosts.slice().reverse()
+		: posts.slice().reverse();
 
 	const onRefresh = () => {
 		setRefresh(true);
@@ -29,8 +31,11 @@ export default function UserPost(props: {
 	};
 
 	useEffect(() => {
-		getAllPosts();
-		getMyPosts();
+		if (!props.isMyPosts) {
+			getAllPosts();
+		} else {
+			getMyPosts();
+		}
 	}, []);
 
 	if (isLoading && !refresh) {
@@ -49,7 +54,10 @@ export default function UserPost(props: {
 				refreshing={refresh}
 				contentContainerStyle={{ gap: 5 }}
 				refreshControl={
-					<RefreshControl refreshing={refresh} onRefresh={onRefresh} />
+					<RefreshControl
+						refreshing={refresh}
+						onRefresh={onRefresh}
+					/>
 				}
 				ListHeaderComponent={props.haveHeader ? <Main /> : null}
 				renderItem={({ item }) => (

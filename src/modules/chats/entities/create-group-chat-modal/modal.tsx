@@ -29,9 +29,9 @@ export function CreateGroupChatModal(props: ICreateGroupChatModalProps) {
 	const { control, handleSubmit } = useForm<IGroupForm>()
 	const { createGroup } = useCreateGroup()
 
-	useEffect(() => {
-		getAllFriends()
-	}, [])
+	// useEffect(() => {
+	// 	getAllFriends()
+	// }, [])
 
 	async function onSearch() {
 		const result = await ImagePicker.requestMediaLibraryPermissionsAsync()

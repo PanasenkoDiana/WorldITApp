@@ -37,9 +37,9 @@ export function useAllMyPhotos(){
 		}
     }
 
-    // useEffect(()=>{
-    //     getMyPhotos()
-    // }, [])
+    useEffect(()=>{
+        getMyPhotos()
+    }, [])
 
     return { myPhotos, isLoading, error, refetch: getMyPhotos }
 }

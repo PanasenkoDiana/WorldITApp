@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { SERVER_HOST } from "../../../shared/constants";
-import { User } from "../../../shared/types";
+import { ProfileWithUser } from "../../auth/types";
 
 export function useRecipient() {
-    const [recipient, setRecipient] = useState<User | null >(null);
+    const [recipient, setRecipient] = useState<ProfileWithUser | null >(null);
 
     async function getRecipient(id: number) {
         try {

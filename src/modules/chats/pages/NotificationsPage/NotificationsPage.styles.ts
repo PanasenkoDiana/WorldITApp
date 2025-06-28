@@ -48,5 +48,6 @@ export const styles = StyleSheet.create({
 	},
 	notificationContent: {
 		fontWeight: 500,
+	
 	},
 });

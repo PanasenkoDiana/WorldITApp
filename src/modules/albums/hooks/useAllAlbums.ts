@@ -37,9 +37,9 @@ export function useAllAlbums(){
 		}
     }
 
-    // useEffect(()=>{
-    //     getAlbums()
-    // }, [])
+    useEffect(()=>{
+        getAlbums()
+    }, [])
 
     return { albums, isLoading, error, refetch: getAlbums }
 }

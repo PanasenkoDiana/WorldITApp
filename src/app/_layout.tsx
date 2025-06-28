@@ -1,7 +1,7 @@
 import { useFonts } from "expo-font";
 import { UserContextProvider } from "../modules/auth/context/userContext";
 import { Providers } from "./providers";
-import { Stack } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import { Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 

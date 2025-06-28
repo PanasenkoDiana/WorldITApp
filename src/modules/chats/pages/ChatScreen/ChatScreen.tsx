@@ -69,11 +69,11 @@ export function ChatScreen() {
 							/>
 						</TouchableOpacity>
 						<View style={styles.recipientHeader}>
-							{thisRecipient?.user_app_profile?.user_app_avatar?.length ? (
+							{thisRecipient?.user_app_avatar.length ? (
 								<Image
 									source={{
 										uri: `${SERVER_HOST}media/${
-											thisRecipient.user_app_profile.user_app_avatar.at(-1)
+											thisRecipient.user_app_avatar.at(-1)
 												?.image
 										}`,
 									}}
@@ -83,7 +83,7 @@ export function ChatScreen() {
 								<DefaultAvatar style={styles.recipientAvatar} />
 							)}
 							<Text style={styles.header}>
-								{thisRecipient?.first_name ?? "Загрузка..."}
+								{thisRecipient?.auth_user.first_name ?? "Загрузка..."}
 							</Text>
 						</View>
 					</View>
@@ -98,6 +98,7 @@ export function ChatScreen() {
 					ref={flatListRef}
 					data={grouped}
 					keyExtractor={(_, index) => `date-${index}`}
+					
 					contentContainerStyle={{ paddingBottom: 16 }}
 					renderItem={({ item }) => {
 						return (
@@ -109,7 +110,7 @@ export function ChatScreen() {
 								</View>
 								{item.data.map((msg: Message) => {
 									const isMyMessage =
-										Number(msg.author_id) === currentUserId;
+										Number(msg.user_app_profile.auth_user.id) === currentUserId;
 									return (
 										<View
 											key={
@@ -124,12 +125,12 @@ export function ChatScreen() {
 										>
 											{/* Аватар собеседника слева, если не мое сообщение */}
 											{!isMyMessage &&
-											thisRecipient?.user_app_profile
+											thisRecipient
 												?.user_app_avatar?.length ? (
 												<Image
 													source={{
 														uri: `${SERVER_HOST}media/${
-															thisRecipient.user_app_profile.user_app_avatar.at(
+															thisRecipient.user_app_avatar.at(
 																-1
 															)?.image
 														}`,

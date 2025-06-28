@@ -32,6 +32,8 @@ export function PostCard(props: IPostCardProps) {
 	const [resultVisible, setResultVisible] = useState<boolean>(false);
 	const [status, setStatus] = useState(0);
 
+	const { user } = useUserContext()
+
 	const [menuPosition, setMenuPosition] = useState({ top: 0, right: 0 });
 	const threeDotsRef = useRef(null);
 
@@ -108,11 +110,15 @@ export function PostCard(props: IPostCardProps) {
 					style={{ marginLeft: "auto", padding: 8 }}
 					onPress={openMenu}
 				>
+					{ props.user_app_profile.auth_user.id === user?.id ?
+					
 					<Ionicons
 						name="ellipsis-vertical"
 						size={22}
 						color={COLORS.black}
-					/>
+					/> :
+					undefined
+					}
 				</TouchableOpacity>
 			</View>
 			<View>
